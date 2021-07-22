@@ -58,7 +58,49 @@
   <audio data-key="76" src="sounds/tink.wav"></audio>
 
 <script>
+  // NOTE: keycode.info for corresponding event key mappings
+  // MRK1/2 design thoughts:
+  // number of loop buttons: 7 Latin, 8 American, 3 Traditional, Total = 18
+  // number of sample buttons: 8
 
+  function playSound(event) {
+    // we want to select the audio element and pass a value of event.keyCode for
+    // the attribute data-key to retrieve the audio element corresponding
+    // to that data-key value
+    const audio = document.querySelector(`audio[data-key="${event.keyCode}"]`);
+    // we also want to corresponding key for the animation
+    const key = document.querySelector(`.key[data-key="${event.keyCode}"]`);
+    // if key is not assigned audio is null
+    // we want to stop the function from running if the audio is null
+    if (!audio) {
+      return;
+    }
+    // NOTE: play functionatliy
+    // if the key is assigned play the audio
+    // if we play the key twice in a row, the audio won't play till the
+    // sample is finished playing
+    // thus we should make sure the sample is at time = 0 before each play
+    audio.currentTime = 0; // rewind to start
+    audio.play();
+    // NOTE: animation functionality
+    // add class "playing"
+    key.classList.add('playing');
+  }
+
+  function removeTransition(event) {
+    if (event.propertyName !== 'transform') return; // return function for all other event propertyNames
+    this.classList.remove('playing');
+  }
+
+  // select all elements with the class key
+  const keys = document.querySelectorAll('.key');
+  // add the event listener for transition end to each key
+  keys.forEach(key => key.addEventListener('transitionend', removeTransition));
+  // add event listener for the element we're listening for
+  // listen for the 'keydown' event
+  // NOTE: there is also 'keyup' event
+  // this may be helpful for snare roll implementation
+  window.addEventListener('keydown', playSound);
 </script>
 
 
